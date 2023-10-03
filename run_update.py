@@ -3,7 +3,7 @@ import pandas as pd
 ### if the module is in a different directory
 # import sys
 # sys.path.append("path/containing/library/folder/")
-from datathon.data_collection import get_oecd
+from datathon.data_collection import currency_convert, get_oecd
 from datathon.plotting import line_plot
 
 # get ais data
@@ -28,7 +28,10 @@ oecd = oecd.sort_values(["obsTime", "EDI"]).groupby("obsTime").tail(1).reset_ind
 # convert obsTime to a date
 oecd["obsTime"] = pd.to_datetime(oecd["obsTime"] + "-01")
 
+# convert to USD
+oecd["exports_usd"] = currency_convert(oecd.loc[:, ["obsTime", "obsValue"]].set_index("obsTime"), "RUB", "USD")
+
 # plotting
-p = line_plot((ais.date, ais.num_ships), (oecd.obsTime, oecd.obsValue))
+p = line_plot((ais.date, ais.num_ships), (oecd.obsTime, oecd.exports_usd))ue))
 p
 plt.savefig("plot.png")

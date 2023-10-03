@@ -1,6 +1,8 @@
+from bs4 import BeautifulSoup
+from dateutil.relativedelta import relativedelta
 import pandas as pd
 import requests
-from bs4 import BeautifulSoup
+import yahoo_fin.stock_info as si
 
 def get_oecd(url):
     """
@@ -57,3 +59,19 @@ def get_oecd(url):
         move_to_end = ["obsTime", "obsValue"]
         row_df = row_df.loc[:, [x for x in row_df.columns if x not in move_to_end] + move_to_end]
     return row_df
+
+
+def currency_convert(series, curr_from = "RUB", curr_to = "USD"):
+    """
+    Convert a series from one currency to another
+    parameters:
+        :series: pd.Series, series with the index set to the date
+        :curr_from: String, 3-letter code for the series to convert from
+        :curr_to: String, 3-letter code for the series to convert to
+    output:
+        :pd.DataFrame: result of the SDMX call
+    """    
+    symbol = f"{curr_from}{curr_to}=X"
+    ex_rates = [si.get_data(symbol, interval="1mo", start_date = series.index[i], end_date = series.index[i] + relativedelta(day=31)).close.values[0] for i in range(len(series))]
+    converted_values = [series.values[i][0] * ex_rates[i] for i in range(len(series))]
+    return converted_values
