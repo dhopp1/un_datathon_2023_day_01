@@ -32,6 +32,6 @@ oecd["obsTime"] = pd.to_datetime(oecd["obsTime"] + "-01")
 oecd["exports_usd"] = currency_convert(oecd.loc[:, ["obsTime", "obsValue"]].set_index("obsTime"), "RUB", "USD")
 
 # plotting
-p = line_plot((ais.date, ais.num_ships), (oecd.obsTime, oecd.exports_usd))ue))
+p = line_plot((ais.date, ais.num_ships), (oecd.obsTime, oecd.exports_usd))
 p
 plt.savefig("plot.png")
